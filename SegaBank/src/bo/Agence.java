@@ -44,4 +44,12 @@ public class Agence {
         sb.append('}');
         return sb.toString();
     }
+
+    public void creationCompte(int id, double solde, boolean payant) {
+        if (payant == false) {
+            CompteSimple compte = new CompteSimple(id, solde);
+        } else {
+            CompteSimple compte = new CompteSimple(id, solde, payant);
+        }
+    }
 }
