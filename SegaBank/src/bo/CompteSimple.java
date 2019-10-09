@@ -2,56 +2,39 @@ package bo;
 
 import java.util.Map;
 
-public class CompteSimple {
+public class CompteSimple extends Compte {
+    private double decouvert;
 
-    protected static Map<Integer, CompteSimple> comptes;
-
-    protected int identifient;
-    protected double solde;
-    protected boolean payant;
-
-    public CompteSimple() {
-    }
     public CompteSimple(int identifient, double solde) {
-        this.identifient = identifient;
-        this.solde = solde;
-        this.payant = false;
+        super(identifient, solde);
+        this.decouvert = 0;
     }
+
+    public CompteSimple(int identifient, double solde, double decouvert) {
+        super(identifient, solde);
+        this.decouvert = decouvert;
+    }
+
     public CompteSimple(int identifient, double solde, boolean payant) {
-        this.identifient = identifient;
-        this.solde = solde;
-        this.payant = payant;
+        super(identifient, solde, payant);
+        this.decouvert = 0;
     }
 
-    public int getIdentifient() {
-        return identifient;
-    }
-
-    public void setIdentifient(int identifient) {
-        this.identifient = identifient;
-    }
-
-    public double getSolde() {
-        return solde;
-    }
-
-    public void setSolde(double solde) {
-        this.solde = solde;
+    public CompteSimple(int identifient, double solde, double decouvert, boolean payant) {
+        super(identifient, solde, payant);
+        this.decouvert = decouvert;
     }
 
     public void versement(double solde) {
-        if (payant) {
-            this.solde += solde * 0.95;
-        } else {
-            this.solde += solde;
-        }
+        if (solde > 0)
+            super.versement(solde);
     }
 
     public void retrait(double solde) {
-        if (payant) {
-            this.solde -= solde * 0.95;
-        } else {
-            this.solde -= solde;
-        }
+        if (solde < 0) solde *= -1;
+        double oldSolde = this.solde;
+        super.retrait(solde);
+        if (decouvert < this.solde)
+            this.solde = oldSolde;
     }
 }
