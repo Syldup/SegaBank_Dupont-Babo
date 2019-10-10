@@ -9,7 +9,8 @@ public class Agence {
     private int id;
     private int code;
     private String adresse;
-    private List<Compte> comptes = new ArrayList<Compte>();
+    private List<Compte> comptesSimple = new ArrayList<Compte>();
+    private List<Compte> comptesEpargne = new ArrayList<Compte>();
 
     public Agence(int id, int code, String adresse) {
         this.id = id;
@@ -41,12 +42,20 @@ public class Agence {
         this.code = code;
     }
 
-    public List<Compte> getComptes() {
-        return comptes;
+    public List<Compte> getComptesSimple() {
+        return comptesSimple;
     }
 
-    public void setComptes(List<Compte> comptes) {
-        this.comptes = comptes;
+    public void setComptesSimple(List<Compte> comptesSimple) {
+        this.comptesSimple = comptesSimple;
+    }
+
+    public List<Compte> getComptesEpargne() {
+        return comptesEpargne;
+    }
+
+    public void setComptesEpargne(List<Compte> comptesEpargne) {
+        this.comptesEpargne = comptesEpargne;
     }
 
     @Override
@@ -64,12 +73,18 @@ public class Agence {
         if (payant == false) {
             Compte compte = new CompteSimple(1, 0);
             System.out.println(compte.toString());
-            this.comptes.add(compte);
+            this.comptesSimple.add(compte);
         } else if (payant == true) {
             Compte compte = new CompteSimple(1, 0, true);
             System.out.println(compte.toString());
-            this.comptes.add(compte);
+            this.comptesSimple.add(compte);
         }
+    }
+
+    public void creationCompteEpargne() {
+        Compte compte = new CompteEpargne(0, 0);
+        System.out.println(compte.toString());
+        this.comptesEpargne.add(compte);
     }
 
 }
