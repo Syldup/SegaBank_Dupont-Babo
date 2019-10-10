@@ -1,195 +1,188 @@
 package bo;
 
+import dal.AgenceDAO;
+
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
 public class Menu {
     Scanner sc = new Scanner(System.in);
-    Agence agence = new Agence(1, 12345, "8 rue d'Alger");
-    private int choix;
+    private List<Agence> agences;
 
     public Menu() {
+        agences = new ArrayList<Agence>();
+    }
+
+    public int getNumber() {
+        int response = 0;
+        boolean ok = false;
+        do {
+            if (ok)
+                System.out.println( "Mauvais choix... merci de recommencer !" );
+                System.out.print( "Entrez votre choix : " );
+            try {
+                response = sc.nextInt();
+            } catch ( InputMismatchException e ) {
+                response = 0;
+                ok = true;
+            } finally {
+                sc.nextLine();
+            }
+        } while (ok);
+        return response;
+    }
+
+    public int getNumber(int max) {
+        int response = 0;
+        do {
+            if (response < 0 || response > max)
+                System.out.printf( "Entrer un nombre entre %d et %d comprie !%n", 0, max );
+            response = getNumber();
+        } while (response < 0 || response > max);
+        return response;
+    }
+
+    public String getString(String msg) {
+        String str = "";
+        do {
+            if (!str.equals(""))
+                System.out.println("Erreur... merci de recommencer !");
+            System.out.println(msg);
+            str = sc.nextLine();
+        } while (str.equals("") || str.length() > 40);
+        return str;
     }
 
     public void mainMenu() {
         int response;
-        boolean first = true;
         do {
-            if ( !first ) {
-                System.out.println( "Mauvais choix... merci de recommencer !" );
-            }
-            System.out.println( "======================================" );
-            System.out.println( "=========== MENU - COMPTE ==========" );
-            System.out.println( "======================================" );
-            System.out.println( "1 - Ajouter un nouveau compte" );
-            System.out.println( "2 - Modifier un compte existant" );
-            System.out.println( "3 - Supprimer un compte existant" );
-            System.out.println( "4 - Lister les comptes" );
-            System.out.println( "5 - Versement");
-            System.out.println( "9 - Quitter" );
-            System.out.print( "Entrez votre choix : " );
-            try {
-                response = sc.nextInt();
-            } catch ( InputMismatchException e ) {
-                response = -1;
-            } finally {
-                sc.nextLine();
-            }
-            first = false;
-        } while ( response < 1 || response > 9 );
+            System.out.println( "=====================================" );
+            System.out.println( "=========== MENU - AGENCES ==========" );
+            System.out.println( "=====================================" );
+            System.out.println( "1 - Créer une nouvelle agence" );
+            System.out.println( "2 - Sélectionner une agence" );
+            System.out.println( "3 - Lister les agences" );
+            System.out.println( "0 - Quitter" );
+            response = getNumber(3);
 
-        switch ( response ) {
-            case 1:
-                creationCompte(this.agence);
-                break;
-            case 2:
-//                updateContact();
-                break;
-            case 3:
-                break;
-            case 4:
-                listComptes(true);
-                break;
-            case 5:
-                versement();
-                break;
-            case 6:
-//                retrait();
-                break;
-            case 7:
-//                sortContacts(true);
-                break;
-            case 8:
-//                sortContacts(false);
-                break;
+            switch (response) {
+                case 1: createAgence(); break;
+                case 2: selectAgence(); break;
+                case 3: listAgence(); break;
+            }
+        } while (response != 0);
+    }
+
+    public void createAgence() {
+        String codeAgence = getString("Entrer le code de l'agence : ");
+        String adresseAgence = getString("Entrer l'adresse de l'agence : ");
+
+        Agence agence = new Agence(codeAgence, adresseAgence);
+        AgenceDAO.getDAO().create(agence);
+        agences.add(agence);
+    }
+
+    public void listAgence() {
+        if (agences.size() != 0) {
+            System.out.println("Actualiser la list des agences : ");
+            System.out.println("1 - Oui");
+            System.out.println("2 - Non");
+            System.out.println("0 - Retour");
+            switch (getNumber(2)) {
+                case 1:
+                    agences.clear();
+                    agences = AgenceDAO.getDAO().findAll();
+                case 2: break;
+                default: return;
+            }
+        } else
+            agences = AgenceDAO.getDAO().findAll();
+
+        System.out.println( "=====================================" );
+        System.out.println( "========= LISTE DES AGENCES =========" );
+        System.out.println( "=====================================" );
+
+        for (int i=0; i<agences.size(); i++)
+            System.out.printf("%d - %s%n", i+1, agences.get(i));
+        selectAgence();
+    }
+
+    public void editAgence(Agence agence) {
+        int rep;
+        do {
+            System.out.printf("Dans %s, Modifier :%n", agence);
+            System.out.println("1 - code");
+            System.out.println("2 - addresse");
+            System.out.println("3 - Valider");
+            System.out.println("0 - Retour");
+            rep = getNumber(3);
+            switch (rep) {
+                case 1: agence.setCode(getString("Entrer le code de l'agence : ")); break;
+                case 2: agence.setAdresse(getString("Entrer l'adresse de l'agence : ")); break;
+                case 0:
+                    Agence oldAgence = AgenceDAO.getDAO().findById(agence.getId());
+                    agence.setAdresse(oldAgence.getAdresse());
+                    agence.setCode(oldAgence.getCode());
+                    break;
+                case 3:
+                    AgenceDAO.getDAO().update(agence);
+                    System.out.println( "Les modifications ont été enregistrées" );
+                    rep = 0;
+            }
+        } while (rep != 0);
+    }
+
+    public void deleteAgence(Agence agence) {
+        System.out.println("Etes-vous sûr : ");
+        System.out.println("0 - Oui");
+        System.out.println("1 - Non");
+        if (getNumber(0) == 0) {
+            agences.remove(agence);
+            AgenceDAO.getDAO().deleteById(agence.getId());
         }
     }
 
-    public void creationCompte(Agence agence) {
-        boolean first = true;
-        boolean second = true;
-        int response;
-        int response2 = 0;
-        Scanner sc = new Scanner(System.in);
+    public void selectAgence() {
+        System.out.println( "Sélectionner une agence : " );
+        System.out.println("-X - La Xème agence");
+        System.out.println("Y - L'agence numero Y");
+        System.out.println("0 - Retour");
+        int rep;
+        Agence curAgence = null;
         do {
-            if (!first) {
-                System.out.println("Mauvais choix");
+            rep = getNumber();
+            if (rep > 0)
+                curAgence = AgenceDAO.getDAO().findById(rep);
+            else if (rep >= -agences.size() && rep < 0)
+                curAgence = agences.get(-rep-1);
+        } while (curAgence == null && rep != 0);
+
+        while (rep != 0) {
+            System.out.println( "========================================" );
+            System.out.printf(  "========= MENU - AGENCE N°%04d =========%n", curAgence.getId());
+            System.out.println( "========================================" );
+            System.out.println( "1 - Modifier l'agence" );
+            System.out.println( "2 - Supprimer l'agence" );
+            System.out.println( "3 - Créer un comple" );
+            System.out.println( "4 - Sélectionner un compte" );
+            System.out.println( "5 - Liser les comples" );
+            System.out.println( "0 - Quitter" );
+            rep = getNumber(5);
+
+            switch (rep) {
+                case 1: editAgence(curAgence); break;
+                case 2:
+                    deleteAgence(curAgence);
+                    rep = 0;
+                    break;
+                /*
+                case 3: createCompte(); break;
+                case 4: selectCompte(); break;
+                case 5: listCompte(); break;*/
             }
-            System.out.println("Sélectionner le type de compte");
-            System.out.println("1 - Simple");
-            System.out.println("2 - Epargne");
-            try {
-                response = sc.nextInt();
-            } catch (InputMismatchException e) {
-                response = -1;
-            } finally {
-                sc.nextLine();
-            }
-            first = false;
-        } while (response < 1  || response > 2);
-
-        if(response == 1) {
-            do {
-                if (!second) {
-                    System.out.println("Mauvais choix");
-                }
-                System.out.println("Sélectionner si il s'agit de compte simple ou payant");
-                System.out.println("1 - Simple");
-                System.out.println("2 - Payant");
-                try {
-                    response2 = sc.nextInt();
-                } catch (InputMismatchException e) {
-                    response2 = -1;
-                } finally {
-                  sc.nextLine();
-                }
-                second = false;
-            }while (response2 < 1 || response2 > 2);
-        }
-        if (response == 2) {
-            agence.creationCompteEpargne();
-        } else if(response == 1 && response2 == 2) {
-            agence.creationCompteSimple(true);
-        } else {
-            agence.creationCompteSimple(false);
-        }
-        this.mainMenu();
-    }
-
-    public void listComptes(boolean dspMainMenu) {
-        System.out.println( "======================================" );
-        System.out.println( "========= LISTE DES COMPTES =========" );
-        System.out.println( "======================================" );
-
-        boolean first = true;
-        int response;
-        Scanner sc = new Scanner(System.in);
-        do {
-            if (!first) {
-                System.out.println("Mauvais choix");
-            }
-            System.out.println("Sélectionner le type de comptes à lister");
-            System.out.println("1 - Simple");
-            System.out.println("2 - Epargne");
-            try {
-                response = sc.nextInt();
-            } catch(InputMismatchException e) {
-                response = -1;
-            } finally {
-                sc.nextLine();
-            }
-        } while (response < 1 || response > 2);
-        List<Compte> list;
-        if (response == 1) {
-            this.choix = response;
-            list = agence.getComptesSimple();
-        } else {
-            this.choix = response;
-            list = agence.getComptesEpargne();
-        }
-
-        for ( int i = 0, length = list.size(); i < length; ++i ) {
-            System.out.printf( "%d - %s%n", i + 1, list.get( i ) );
-        }
-
-        if(dspMainMenu) {
-            this.mainMenu();
         }
     }
 
-    public void versement() {
-
-        System.out.println( "Choisissez le compte ..." );
-        boolean first = true;
-        int response;
-        int sizeEpargne = agence.getComptesEpargne().size();
-        int sizeSimple = agence.getComptesSimple().size();
-        do {
-            if ( !first ) {
-                System.out.println( "Mauvais choix... merci de recommencer !" );
-            }
-            this.listComptes(false);
-            System.out.print( "Votre choix : " );
-            try {
-                response = sc.nextInt();
-            } catch ( InputMismatchException e ) {
-                response = -1;
-            } finally {
-                sc.nextLine();
-            }
-            first = false;
-        } while ( (response < 1 || response > sizeEpargne) || (response < 1 || response > sizeSimple) );
-
-        if (this.choix == 1) {
-            Compte compte = agence.getComptesSimple().get( (response -1 ) );
-            System.out.printf( "======== VERSEMENT DU COMPTE SIMPLE ========" );
-
-            System.out.println( "Entrez la somme à verser : ");
-            double versement = sc.nextDouble();
-            if (versement != 0) {
-            }
-
-        }
-    }
 }

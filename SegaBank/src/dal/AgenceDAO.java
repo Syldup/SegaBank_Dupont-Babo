@@ -4,12 +4,14 @@ import bo.Agence;
 
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AgenceDAO implements IDAO<Integer, Agence> {
 
     private static final AgenceDAO DAO = new AgenceDAO();
-    private static final String INSERT_QUERY = "INSERT INTO agence (code, addresse) VALUES (?, '?')";
-    private static final String UPDATE_QUERY = "UPDATE agence SET code=?, addresse='?' WHERE idAgence=?";
+    private static final String INSERT_QUERY = "INSERT INTO agence (code, adresse) VALUES (?, ?)";
+    private static final String UPDATE_QUERY = "UPDATE agence SET code=?, adresse=? WHERE idAgence=?";
     private static final String FIND_ALL_QUERY = "SELECT * FROM agence";
     private static final String FIND_ID_QUERY = "SELECT * FROM agence WHERE idAgence=?";
     private static final String DELETE_QUERY = "DELETE FROM agence WHERE idCompte=?";
@@ -22,7 +24,7 @@ public class AgenceDAO implements IDAO<Integer, Agence> {
     public void create(Agence object) {
         try (Connection conn = PersistenceManager.getConn();
              PreparedStatement ps = conn.prepareStatement(INSERT_QUERY, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setInt(1, object.getCode());
+            ps.setString(1, object.getCode());
             ps.setString(2, object.getAdresse());
             ps.executeUpdate();
             try(ResultSet rs = ps.getGeneratedKeys()) {
@@ -39,7 +41,7 @@ public class AgenceDAO implements IDAO<Integer, Agence> {
         if (object.getId() != 0)
         try (Connection conn = PersistenceManager.getConn();
              PreparedStatement ps = conn.prepareStatement(UPDATE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setInt(1, object.getCode());
+            ps.setString(1, object.getCode());
             ps.setString(2, object.getAdresse());
             ps.setInt(3, object.getId());
             ps.executeUpdate();
@@ -49,17 +51,13 @@ public class AgenceDAO implements IDAO<Integer, Agence> {
     }
 
     @Override
-    public Agence[] findAll() {
-        Agence[] objects = {};
+    public List<Agence> findAll() {
+        List<Agence> objects = new ArrayList<Agence>();
         try (Connection conn = PersistenceManager.getConn();
              Statement s = conn.createStatement();
              ResultSet rs = s.executeQuery(FIND_ALL_QUERY)) {
-            rs.last();
-            objects = new Agence[rs.getRow()];
-            rs.beforeFirst();
-            int i = 0;
             while (rs.next())
-                objects[i++] = new Agence(rs);
+                objects.add(new Agence(rs));
         } catch (SQLException | IOException e) {
             System.out.println(e.getMessage());
         }

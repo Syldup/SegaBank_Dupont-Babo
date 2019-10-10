@@ -1,9 +1,12 @@
 package dal;
 
+import bo.Agence;
 import bo.CompteSimple;
 
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CompteSimpleDAO implements IDAO<Integer, CompteSimple> {
 
@@ -17,6 +20,11 @@ public class CompteSimpleDAO implements IDAO<Integer, CompteSimple> {
     private CompteSimpleDAO() {}
 
     public static CompteSimpleDAO getDAO() { return DAO;}
+
+    public void create(CompteSimple object, int idAgence) {
+        object.setIdAgence(idAgence);
+        create(object);
+    }
 
     @Override
     public void create(CompteSimple object) {
@@ -50,17 +58,13 @@ public class CompteSimpleDAO implements IDAO<Integer, CompteSimple> {
     }
 
     @Override
-    public CompteSimple[] findAll() {
-        CompteSimple[] objects = {};
+    public List<CompteSimple> findAll() {
+        List<CompteSimple> objects = new ArrayList<CompteSimple>();
         try (Connection conn = PersistenceManager.getConn();
              Statement s = conn.createStatement();
              ResultSet rs = s.executeQuery(FIND_ALL_QUERY)) {
-            rs.last();
-            objects = new CompteSimple[rs.getRow()];
-            rs.beforeFirst();
-            int i = 0;
             while (rs.next())
-                objects[i++] = new CompteSimple(rs);
+                objects.add(new CompteSimple(rs));
         } catch (SQLException | IOException e) {
             System.out.println(e.getMessage());
         }

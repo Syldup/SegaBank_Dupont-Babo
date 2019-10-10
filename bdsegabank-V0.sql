@@ -1,4 +1,5 @@
 -- phpMyAdmin SQL Dump
+-- phpMyAdmin SQL Dump
 -- version 4.8.5
 -- https://www.phpmyadmin.net/
 --
@@ -34,7 +35,7 @@ DROP TABLE IF EXISTS `agence`;
 CREATE TABLE IF NOT EXISTS `agence` (
   `idAgence` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `code` varchar(45) DEFAULT NULL,
-  `addresse` varchar(45) DEFAULT NULL,
+  `adresse` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`idAgence`),
   UNIQUE KEY `idAgence_UNIQUE` (`idAgence`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

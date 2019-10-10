@@ -2,6 +2,7 @@ package dal;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,13 +15,15 @@ public class PersistenceManager {
     private static Connection conn;
 
     public static Connection getConn() throws SQLException, IOException {
-        if (conn == null || conn.isClosed() || conn.isValid(5)) {
-            Path path = Paths.get(".\\db.properties");
-            FileInputStream fis = (FileInputStream) Files.newInputStream(path);
-            Properties props = new Properties();
-            props.load(fis);
-            conn = DriverManager.getConnection(props.getProperty("DB_URL"), props.getProperty("DB_LOGIN"), props.getProperty("DB_PASSWORD"));
-        }
+        if (conn == null || conn.isClosed() || conn.isValid(5))
+            try (InputStream input = new FileInputStream(".\\resources\\config.properties")) {
+                Properties prop = new Properties();
+                prop.load(input);
+                conn = DriverManager.getConnection(prop.getProperty("db.url"),
+                        prop.getProperty("db.user"), prop.getProperty("db.password"));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         return conn;
     }
 
