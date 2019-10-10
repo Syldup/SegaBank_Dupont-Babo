@@ -1,7 +1,16 @@
 package bo;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class CompteEpargne extends Compte {
     private double tauxInteret;
+
+    public CompteEpargne(ResultSet rs) throws SQLException {
+        super(rs.getInt("identifiant"), rs.getDouble("solde"), rs.getBoolean("payant"));
+        this.id = rs.getInt("idCompteEpargne");
+        this.tauxInteret = rs.getDouble("tauxInteret");
+    }
 
     public CompteEpargne(int identifient, double solde) {
         super(identifient, solde);
@@ -21,6 +30,14 @@ public class CompteEpargne extends Compte {
     public CompteEpargne(int identifient, double solde, double tauxInteret, boolean payant) {
         super(identifient, solde, payant);
         this.tauxInteret = tauxInteret;
+    }
+
+    public double getTauxInteret() { return tauxInteret; }
+
+    @Override
+    public String toString() {
+        return String.format("CompteEpargne{identifient=%d, solde=%.2f, payant=%b, tauxInteret=%.2f}",
+                identifient, solde, payant, tauxInteret);
     }
 
     public void calculInteret() {

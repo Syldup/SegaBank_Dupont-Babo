@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le :  mer. 09 oct. 2019 à 06:20
+-- Généré le :  jeu. 10 oct. 2019 à 08:20
 -- Version du serveur :  5.7.26
 -- Version de PHP :  7.2.18
 
@@ -21,7 +21,6 @@ SET time_zone = "+00:00";
 --
 -- Base de données :  `bdsegabank`
 --
-DROP DATABASE IF EXISTS `bdsegabank`;
 CREATE DATABASE IF NOT EXISTS `bdsegabank` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 USE `bdsegabank`;
 
@@ -52,11 +51,11 @@ CREATE TABLE IF NOT EXISTS `compte` (
   `identifiant` int(11) NOT NULL,
   `solde` double NOT NULL,
   `payant` tinyint(4) NOT NULL,
-  `Agence_idAgence` int(10) UNSIGNED NOT NULL,
-  PRIMARY KEY (`idCompte`,`Agence_idAgence`),
+  `idAgence` int(10) UNSIGNED NOT NULL,
+  PRIMARY KEY (`idCompte`,`idAgence`),
   UNIQUE KEY `idCompte_UNIQUE` (`idCompte`),
   UNIQUE KEY `identifiant_UNIQUE` (`identifiant`),
-  KEY `fk_Compte_Agence_idx` (`Agence_idAgence`)
+  KEY `fk_Compte_Agence_idx` (`idAgence`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -67,11 +66,9 @@ CREATE TABLE IF NOT EXISTS `compte` (
 
 DROP TABLE IF EXISTS `compteepargne`;
 CREATE TABLE IF NOT EXISTS `compteepargne` (
-  `idCompteEpargne` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `tauxInteret` double NOT NULL,
   `idCompte` int(10) UNSIGNED NOT NULL,
-  PRIMARY KEY (`idCompteEpargne`,`idCompte`),
-  UNIQUE KEY `idEpargne_UNIQUE` (`idCompteEpargne`),
+  PRIMARY KEY (`idCompte`),
   KEY `fk_CompteEpargne_Compte1_idx` (`idCompte`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -83,11 +80,9 @@ CREATE TABLE IF NOT EXISTS `compteepargne` (
 
 DROP TABLE IF EXISTS `comptesimple`;
 CREATE TABLE IF NOT EXISTS `comptesimple` (
-  `idCompteSimple` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `decouvert` double NOT NULL,
   `idCompte` int(10) UNSIGNED NOT NULL,
-  PRIMARY KEY (`idCompteSimple`,`idCompte`),
-  UNIQUE KEY `idCompteSimple_UNIQUE` (`idCompteSimple`),
+  PRIMARY KEY (`idCompte`),
   KEY `fk_CompteSimple_Compte1_idx` (`idCompte`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -99,7 +94,7 @@ CREATE TABLE IF NOT EXISTS `comptesimple` (
 -- Contraintes pour la table `compte`
 --
 ALTER TABLE `compte`
-  ADD CONSTRAINT `fk_Compte_Agence` FOREIGN KEY (`Agence_idAgence`) REFERENCES `agence` (`idAgence`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_Compte_Agence` FOREIGN KEY (`idAgence`) REFERENCES `agence` (`idAgence`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Contraintes pour la table `compteepargne`

@@ -1,12 +1,11 @@
 package bo;
 
 public class Compte {
+    protected int id = 0;
     protected int identifient;
     protected double solde;
     protected boolean payant;
 
-    public Compte() {
-    }
     public Compte(int identifient, double solde) {
         this.identifient = identifient;
         this.solde = solde;
@@ -18,12 +17,26 @@ public class Compte {
         this.payant = payant;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public int getIdentifient() {
         return identifient;
     }
 
     public double getSolde() {
         return solde;
+    }
+
+    public boolean isPayant() { return payant; }
+
+    public int getIdAgence() {
+        return 1;
     }
 
     public void versement(double solde) {

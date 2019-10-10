@@ -1,9 +1,17 @@
 package bo;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Map;
 
 public class CompteSimple extends Compte {
     private double decouvert;
+
+    public CompteSimple(ResultSet rs) throws SQLException {
+        super(rs.getInt("identifiant"), rs.getDouble("solde"), rs.getBoolean("payant"));
+        this.id = rs.getInt("idCompteSimple");
+        this.decouvert = rs.getDouble("decouvert");
+    }
 
     public CompteSimple(int identifient, double solde) {
         super(identifient, solde);
@@ -23,6 +31,16 @@ public class CompteSimple extends Compte {
     public CompteSimple(int identifient, double solde, double decouvert, boolean payant) {
         super(identifient, solde, payant);
         this.decouvert = decouvert;
+    }
+
+    public double getDecouvert() {
+        return decouvert;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("CompteSimple{identifient=%d, solde=%.2f, payant=%b, decouvert=%.2f}",
+                identifient, solde, payant, decouvert);
     }
 
     public void versement(double solde) {
