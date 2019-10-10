@@ -9,7 +9,8 @@ public class Agence {
     private int id = 0;
     private int code;
     private String adresse;
-    private List<Compte> comptes = new ArrayList<Compte>();
+    private List<Compte> comptesSimple = new ArrayList<Compte>();
+    private List<Compte> comptesEpargne = new ArrayList<Compte>();
 
     public Agence(ResultSet rs) throws SQLException {
         this.id = rs.getInt("idAgence");
@@ -46,12 +47,20 @@ public class Agence {
         this.code = code;
     }
 
-    public List<Compte> getComptes() {
-        return comptes;
+    public List<Compte> getComptesSimple() {
+        return comptesSimple;
     }
 
-    public void setComptes(List<Compte> comptes) {
-        this.comptes = comptes;
+    public void setComptesSimple(List<Compte> comptesSimple) {
+        this.comptesSimple = comptesSimple;
+    }
+
+    public List<Compte> getComptesEpargne() {
+        return comptesEpargne;
+    }
+
+    public void setComptesEpargne(List<Compte> comptesEpargne) {
+        this.comptesEpargne = comptesEpargne;
     }
 
     @Override
@@ -72,6 +81,12 @@ public class Agence {
         Compte compte = new CompteSimple(1, 0, payant);
         System.out.println(compte.toString());
         this.comptes.add(compte);
+    }
+
+    public void creationCompteEpargne() {
+        Compte compte = new CompteEpargne(0, 0);
+        System.out.println(compte.toString());
+        this.comptesEpargne.add(compte);
     }
 
 }
