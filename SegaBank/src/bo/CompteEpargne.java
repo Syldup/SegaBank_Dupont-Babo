@@ -44,3 +44,30 @@ public class CompteEpargne extends Compte {
         solde *= 1+tauxInteret;
     }
 }
+/*
+package bo;
+
+public class CompteEpargne extends CompteSimple{
+
+    private double tauxInteret;
+    private double interet;
+
+    public CompteEpargne(int id, double solde, double tauxInteret) {
+        super(id, solde);
+        this.tauxInteret = tauxInteret;
+    }
+
+    public void calculInteret() {
+        this.interet = this.solde * this.tauxInteret;
+    }
+
+    public double getInteret() {
+        return interet;
+    }
+
+    public void setInteret(double interet) {
+        this.interet = interet;
+    }
+}
+
+ */

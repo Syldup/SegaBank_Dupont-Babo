@@ -54,4 +54,14 @@ public class Compte {
             this.solde -= solde;
         }
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Compte{");
+        sb.append("identifient=").append(identifient);
+        sb.append(", solde=").append(solde);
+        sb.append(", payant=").append(payant);
+        sb.append('}');
+        return sb.toString();
+    }
 }

@@ -1,9 +1,15 @@
 package bo;
 
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.List;
+import java.util.Scanner;
+
 public class Agence {
     private int id;
     private int code;
     private String adresse;
+    private List<Compte> comptes = new ArrayList<Compte>();
 
     public Agence(int id, int code, String adresse) {
         this.id = id;
@@ -35,6 +41,14 @@ public class Agence {
         this.code = code;
     }
 
+    public List<Compte> getComptes() {
+        return comptes;
+    }
+
+    public void setComptes(List<Compte> comptes) {
+        this.comptes = comptes;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Agence{");
@@ -45,11 +59,17 @@ public class Agence {
         return sb.toString();
     }
 
-    public void creationCompte(int id, double solde, boolean payant) {
+    public void creationCompteSimple(boolean payant) {
+
         if (payant == false) {
-            CompteSimple compte = new CompteSimple(id, solde);
-        } else {
-            CompteSimple compte = new CompteSimple(id, solde, payant);
+            Compte compte = new CompteSimple(1, 0);
+            System.out.println(compte.toString());
+            this.comptes.add(compte);
+        } else if (payant == true) {
+            Compte compte = new CompteSimple(1, 0, true);
+            System.out.println(compte.toString());
+            this.comptes.add(compte);
         }
     }
+
 }
