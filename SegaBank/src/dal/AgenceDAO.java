@@ -1,30 +1,29 @@
 package dal;
 
-import bo.CompteEpargne;
+import bo.Agence;
 
 import java.io.IOException;
 import java.sql.*;
 
-public class CompteEpargneDAO implements IDAO<Integer, CompteEpargne> {
+public class AgenceDAO implements IDAO<Integer, Agence> {
 
-    private static final CompteEpargneDAO DAO = new CompteEpargneDAO();
-    private static final String INSERT_QUERY = "INSERT INTO compteepargne (tauxInteret, idCompte) VALUES (?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE compteepargne SET tauxInteret=? WHERE idCompte=?";
-    private static final String FIND_ALL_QUERY = "SELECT * FROM compteepargne ce LEFT JOIN compte AS c ON ce.idCompte=c.idCompte";
-    private static final String FIND_ID_QUERY = "SELECT * FROM compteepargne ce LEFT JOIN compte AS c ON ce.idCompte=c.idCompte WHERE ce.idCompte=?";
-    private static final String DELETE_QUERY = "DELETE FROM compteepargne WHERE idCompte=?";
+    private static final AgenceDAO DAO = new AgenceDAO();
+    private static final String INSERT_QUERY = "INSERT INTO agence (code, addresse) VALUES (?, '?')";
+    private static final String UPDATE_QUERY = "UPDATE agence SET code=?, addresse='?' WHERE idAgence=?";
+    private static final String FIND_ALL_QUERY = "SELECT * FROM agence";
+    private static final String FIND_ID_QUERY = "SELECT * FROM agence WHERE idAgence=?";
+    private static final String DELETE_QUERY = "DELETE FROM agence WHERE idCompte=?";
 
-    private CompteEpargneDAO() {}
+    private AgenceDAO() {}
 
-    public static CompteEpargneDAO getDAO() { return DAO;}
+    public static AgenceDAO getDAO() { return DAO;}
 
     @Override
-    public void create(CompteEpargne object) {
+    public void create(Agence object) {
         try (Connection conn = PersistenceManager.getConn();
              PreparedStatement ps = conn.prepareStatement(INSERT_QUERY, Statement.RETURN_GENERATED_KEYS)) {
-            CompteDAO.getDAO().create(object);
-            ps.setDouble(1, object.getTauxInteret());
-            ps.setInt(2, object.getId());
+            ps.setInt(1, object.getCode());
+            ps.setString(2, object.getAdresse());
             ps.executeUpdate();
             try(ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next())
@@ -36,13 +35,13 @@ public class CompteEpargneDAO implements IDAO<Integer, CompteEpargne> {
     }
 
     @Override
-    public void update(CompteEpargne object) {
+    public void update(Agence object) {
         if (object.getId() != 0)
         try (Connection conn = PersistenceManager.getConn();
              PreparedStatement ps = conn.prepareStatement(UPDATE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
-            CompteDAO.getDAO().update(object);
-            ps.setDouble(1, object.getTauxInteret());
-            ps.setInt(2, object.getId());
+            ps.setInt(1, object.getCode());
+            ps.setString(2, object.getAdresse());
+            ps.setInt(3, object.getId());
             ps.executeUpdate();
         } catch (SQLException | IOException e) {
             System.out.println(e.getMessage());
@@ -50,17 +49,17 @@ public class CompteEpargneDAO implements IDAO<Integer, CompteEpargne> {
     }
 
     @Override
-    public CompteEpargne[] findAll() {
-        CompteEpargne[] objects = {};
+    public Agence[] findAll() {
+        Agence[] objects = {};
         try (Connection conn = PersistenceManager.getConn();
              Statement s = conn.createStatement();
              ResultSet rs = s.executeQuery(FIND_ALL_QUERY)) {
             rs.last();
-            objects = new CompteEpargne[rs.getRow()];
+            objects = new Agence[rs.getRow()];
             rs.beforeFirst();
             int i = 0;
             while (rs.next())
-                objects[i++] = new CompteEpargne(rs);
+                objects[i++] = new Agence(rs);
         } catch (SQLException | IOException e) {
             System.out.println(e.getMessage());
         }
@@ -68,14 +67,14 @@ public class CompteEpargneDAO implements IDAO<Integer, CompteEpargne> {
     }
 
     @Override
-    public CompteEpargne findById(Integer integer) {
-        CompteEpargne object = null;
+    public Agence findById(Integer integer) {
+        Agence object = null;
         try (Connection conn = PersistenceManager.getConn();
              PreparedStatement ps = conn.prepareStatement(FIND_ID_QUERY, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, integer);
             try(ResultSet rs = ps.executeQuery();) {
                 if (rs.next())
-                    object = new CompteEpargne(rs);
+                    object = new Agence(rs);
             }
         } catch (SQLException | IOException e) {
             System.out.println(e.getMessage());

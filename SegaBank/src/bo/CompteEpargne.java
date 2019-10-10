@@ -7,8 +7,7 @@ public class CompteEpargne extends Compte {
     private double tauxInteret;
 
     public CompteEpargne(ResultSet rs) throws SQLException {
-        super(rs.getInt("identifiant"), rs.getDouble("solde"), rs.getBoolean("payant"));
-        this.id = rs.getInt("idCompteEpargne");
+        super(rs);
         this.tauxInteret = rs.getDouble("tauxInteret");
     }
 
@@ -36,8 +35,8 @@ public class CompteEpargne extends Compte {
 
     @Override
     public String toString() {
-        return String.format("CompteEpargne{identifient=%d, solde=%.2f, payant=%b, tauxInteret=%.2f}",
-                identifient, solde, payant, tauxInteret);
+        return String.format("CompteEpargne{id=%d, identifient=%d, solde=%.2f, payant=%b, tauxInteret=%.2f}",
+                id, identifient, solde, payant, tauxInteret);
     }
 
     public void calculInteret() {

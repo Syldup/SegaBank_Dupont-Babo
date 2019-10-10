@@ -7,14 +7,14 @@ import java.sql.*;
 
 public class CompteDAO implements IDAO<Integer, Compte> {
 
-    private static final CompteDAO compteDAO = new CompteDAO();
+    private static final CompteDAO DAO = new CompteDAO();
     private static final String INSERT_QUERY = "INSERT INTO compte (identifiant, solde, payant, idAgence) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_QUERY = "UPDATE compte SET identifient=?, solde=?, payant=?, idAgence=? WHERE idCompte = ?";
     private static final String DELETE_QUERY = "DELETE FROM compte WHERE idCompte=?";
 
     private CompteDAO() {}
 
-    public static CompteDAO getDAO() { return compteDAO;}
+    public static CompteDAO getDAO() { return DAO;}
 
     @Override
     public void create(Compte object) {

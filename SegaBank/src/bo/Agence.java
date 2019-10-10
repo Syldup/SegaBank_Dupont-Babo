@@ -1,18 +1,23 @@
 package bo;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.List;
-import java.util.Scanner;
 
 public class Agence {
-    private int id;
+    private int id = 0;
     private int code;
     private String adresse;
     private List<Compte> comptes = new ArrayList<Compte>();
 
-    public Agence(int id, int code, String adresse) {
-        this.id = id;
+    public Agence(ResultSet rs) throws SQLException {
+        this.id = rs.getInt("idAgence");
+        this.code = rs.getInt("code");
+        this.adresse = rs.getString("adresse");
+    }
+
+    public Agence(int code, String adresse) {
         this.code = code;
         this.adresse = adresse;
     }
@@ -51,25 +56,22 @@ public class Agence {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Agence{");
-        sb.append("id=").append(id);
-        sb.append(", code=").append(code);
-        sb.append(", adresse='").append(adresse).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return String.format("Agence{id=%d, code=%d, adresse=%s}",
+                id, code, adresse);
     }
 
-    public void creationCompteSimple(boolean payant) {
+    public void createCompteSimple() {
 
-        if (payant == false) {
-            Compte compte = new CompteSimple(1, 0);
-            System.out.println(compte.toString());
-            this.comptes.add(compte);
-        } else if (payant == true) {
-            Compte compte = new CompteSimple(1, 0, true);
-            System.out.println(compte.toString());
-            this.comptes.add(compte);
-        }
+        Compte compte = new CompteSimple(1, 0);
+        System.out.println(compte.toString());
+        this.comptes.add(compte);
+    }
+
+    public void createCompteSimple(boolean payant) {
+
+        Compte compte = new CompteSimple(1, 0, payant);
+        System.out.println(compte.toString());
+        this.comptes.add(compte);
     }
 
 }

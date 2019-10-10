@@ -1,10 +1,22 @@
 package bo;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Compte {
     protected int id = 0;
     protected int identifient;
     protected double solde;
     protected boolean payant;
+    protected int idAgence = 0;
+
+    public Compte(ResultSet rs) throws SQLException {
+        this.id = rs.getInt("idCompte");
+        this.identifient = rs.getInt("identifiant");
+        this.solde = rs.getDouble("solde");
+        this.payant = rs.getBoolean("payant");
+        this.idAgence = rs.getInt("idAgence");
+    }
 
     public Compte(int identifient, double solde) {
         this.identifient = identifient;
@@ -17,27 +29,20 @@ public class Compte {
         this.payant = payant;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
     public int getIdentifient() {
         return identifient;
     }
-
     public double getSolde() {
         return solde;
     }
 
-    public boolean isPayant() { return payant; }
+    public int getIdAgence() { return idAgence; }
+    public void setIdAgence(int idAgence) { this.idAgence = idAgence; }
 
-    public int getIdAgence() {
-        return 1;
-    }
+    public boolean isPayant() { return payant; }
 
     public void versement(double solde) {
         if (payant) {
@@ -57,11 +62,7 @@ public class Compte {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Compte{");
-        sb.append("identifient=").append(identifient);
-        sb.append(", solde=").append(solde);
-        sb.append(", payant=").append(payant);
-        sb.append('}');
-        return sb.toString();
+        return String.format("CompteEpargne{id=%d, identifient=%d, solde=%.2f, payant=%b}",
+                id, identifient, solde, payant);
     }
 }

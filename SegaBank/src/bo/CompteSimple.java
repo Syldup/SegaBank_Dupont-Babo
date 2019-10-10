@@ -8,8 +8,7 @@ public class CompteSimple extends Compte {
     private double decouvert;
 
     public CompteSimple(ResultSet rs) throws SQLException {
-        super(rs.getInt("identifiant"), rs.getDouble("solde"), rs.getBoolean("payant"));
-        this.id = rs.getInt("idCompteSimple");
+        super(rs);
         this.decouvert = rs.getDouble("decouvert");
     }
 
@@ -39,8 +38,8 @@ public class CompteSimple extends Compte {
 
     @Override
     public String toString() {
-        return String.format("CompteSimple{identifient=%d, solde=%.2f, payant=%b, decouvert=%.2f}",
-                identifient, solde, payant, decouvert);
+        return String.format("CompteSimple{id=%d, identifient=%d, solde=%.2f, payant=%b, decouvert=%.2f}",
+                id, identifient, solde, payant, decouvert);
     }
 
     public void versement(double solde) {
