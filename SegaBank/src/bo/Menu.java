@@ -109,6 +109,10 @@ public class Menu {
         System.out.println( "========= LISTE DES AGENCES =========" );
         System.out.println( "=====================================" );
 
+        if (agences.size() == 0) {
+            System.out.println("Il n'y a pas d'agences enregistrées");
+            return;
+        }
         for (int i=0; i<agences.size(); i++)
             System.out.printf("%d - %s%n", i+1, agences.get(i));
         selectAgence();
@@ -249,8 +253,79 @@ public class Menu {
         System.out.println( "========= LISTE DES COMPTES =========" );
         System.out.println( "=====================================" );
 
+        if(curAgence.getComptes().size() == 0) {
+            System.out.println("Il n'y a pas de compte enregistré");
+            return;
+        }
         curAgence.printComptes();
 
-       // selectAgence();
+        selectCompte(curAgence);
+    }
+
+
+    public void selectCompte(Agence curAgence) {
+        System.out.println( "Sélectionner un compte : " );
+        System.out.println("-X - Le numéro du compte");
+        System.out.println("Y - L'agence numero Y");
+        System.out.println("0 - Retour");
+        int rep = 0;
+        Compte curCompte = null;
+        do {
+            rep = (int)getNumber();
+            if (rep > 0)
+                curCompte = curAgence.getComptes().get(rep-1);
+            else if (rep >= -curAgence.getComptes().size() && rep < 0)
+                curCompte = curAgence.getComptes().get(-rep-1);
+        } while (curCompte == null && rep != 0);
+
+        while (rep != 0) {
+            System.out.println( "========================================" );
+            System.out.printf(  "========= MENU - COMPTE N°%04d =========%n", curCompte.getId());
+            System.out.println( "========================================" );
+            System.out.println( "1 - Faire un versement" );
+            System.out.println( "2 - Faire un retrait" );
+            System.out.println( "3 - Supprimer le compte" );
+            System.out.println( "0 - Quitter" );
+            rep = getNumber(3);
+
+            switch (rep) {
+                case 1: versement(curCompte); break;
+                case 2: retrait(curCompte);
+                    break;
+                case 3: deleteCompte(curAgence, curCompte);
+                    rep = 0;
+                    break;
+
+                /*
+                case 4: selectCompte(); break;
+                 */
+                //case 5: listCompte(curAgence); break;
+            }
+        }
+    }
+    public void versement(Compte curCompte) {
+        System.out.println( "Sélectionner le montant à verser : " );
+        double rep = getNumber();
+        curCompte.versement(rep);
+        CompteDAO.getDAO().update(curCompte);
+    }
+
+    public void retrait(Compte curCompte) {
+        System.out.println( "Sélectionner le montant à retirer : " );
+        double rep = getNumber();
+        curCompte.retrait(rep);
+        CompteDAO.getDAO().update(curCompte);
+    }
+
+    public void deleteCompte(Agence curAgence, Compte curCompte) {
+        System.out.println("Etes-vous sûr : ");
+        System.out.println("0 - Oui");
+        System.out.println("1 - Non");
+        if (getNumber() == 0) {
+            curAgence.getComptes().remove(curCompte);
+            CompteSimpleDAO.getDAO().deleteById(curCompte.getId());
+            CompteDAO.getDAO().deleteById(curCompte.getId());
+        }
     }
 }
+
