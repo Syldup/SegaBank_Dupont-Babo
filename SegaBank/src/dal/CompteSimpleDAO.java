@@ -16,6 +16,8 @@ public class CompteSimpleDAO implements IDAO<Integer, CompteSimple> {
     private static final String FIND_ALL_QUERY = "SELECT * FROM comptesimple cs LEFT JOIN compte AS c ON cs.idCompte=c.idCompte";
     private static final String FIND_ID_QUERY = "SELECT * FROM comptesimple cs LEFT JOIN compte AS c ON cs.idCompte=c.idCompte WHERE cs.idCompte=?";
     private static final String DELETE_QUERY = "DELETE FROM comptesimple WHERE idCompte=?";
+    private static final String FIND_BY_AGENCE_QUERY = "SELECT * FROM comptesimple cs LEFT JOIN compte AS c ON cs.idCompte=c.idCompte WHERE c.idAgence=?";
+
 
     private CompteSimpleDAO() {}
 
@@ -97,5 +99,21 @@ public class CompteSimpleDAO implements IDAO<Integer, CompteSimple> {
         } catch (SQLException | IOException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public List<CompteSimple> findAgence(Integer interger) {
+        List<CompteSimple> objects = new ArrayList<CompteSimple>();
+        try (Connection conn = PersistenceManager.getConn();
+             PreparedStatement ps = conn.prepareStatement(FIND_BY_AGENCE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, interger);
+            ps.executeQuery();
+            try(ResultSet rs = ps.executeQuery();) {
+                while (rs.next())
+                    objects.add(new CompteSimple(rs));
+            }
+        } catch (SQLException | IOException e) {
+            System.out.println(e.getMessage());
+        }
+        return objects;
     }
 }

@@ -43,10 +43,24 @@ public class Agence {
         this.adresse = adresse;
     }
 
+    public List<Compte> getComptes() { return comptes; }
+    public void setComptes(List<Compte> comptes) { this.comptes = comptes; }
 
     @Override
     public String toString() {
         return String.format("Agence{id=%d, code=%s, adresse=%s}",
                 id, code, adresse);
+    }
+
+    public void ajouterCompte(Compte compte) {
+        this.comptes.add(compte);
+    }
+
+    public void ajouterComptes(List<Compte> comptes) {
+        this.comptes.addAll(comptes);
+    }
+
+    public void clear() {
+        this.comptes.clear();
     }
 }
