@@ -13,7 +13,6 @@ public class CompteDAO implements IDAO<Integer, Compte> {
     private static final String UPDATE_QUERY = "UPDATE compte SET identifiant=?, solde=?, payant=? WHERE idCompte = ?";
     private static final String DELETE_QUERY = "DELETE FROM compte WHERE idCompte=?";
 
-
     private CompteDAO() {}
 
     public static CompteDAO getDAO() { return DAO;}
