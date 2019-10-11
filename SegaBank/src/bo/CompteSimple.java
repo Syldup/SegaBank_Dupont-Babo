@@ -51,7 +51,7 @@ public class CompteSimple extends Compte {
         if (solde < 0) solde *= -1;
         double oldSolde = this.solde;
         super.retrait(solde);
-        if (decouvert < this.solde)
+        if (-decouvert > this.solde)
             this.solde = oldSolde;
     }
 }

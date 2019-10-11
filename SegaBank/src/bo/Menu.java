@@ -290,8 +290,7 @@ public class Menu {
 
             switch (rep) {
                 case 1: versement(curCompte); break;
-                case 2: retrait(curCompte);
-                    break;
+                case 2: retrait(curCompte);break;
                 case 3: deleteCompte(curAgence, curCompte);
                     rep = 0;
                     break;
@@ -323,7 +322,10 @@ public class Menu {
         System.out.println("1 - Non");
         if (getNumber() == 0) {
             curAgence.getComptes().remove(curCompte);
-            CompteSimpleDAO.getDAO().deleteById(curCompte.getId());
+            if (curCompte instanceof CompteSimple)
+                CompteSimpleDAO.getDAO().deleteById(curCompte.getId());
+            else if (curCompte instanceof CompteEpargne)
+                CompteEpargneDAO.getDAO().deleteById(curCompte.getId());
             CompteDAO.getDAO().deleteById(curCompte.getId());
         }
     }
