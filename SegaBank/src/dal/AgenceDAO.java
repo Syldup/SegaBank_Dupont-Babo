@@ -91,5 +91,4 @@ public class AgenceDAO implements IDAO<Integer, Agence> {
             System.out.println(e.getMessage());
         }
     }
-
 }

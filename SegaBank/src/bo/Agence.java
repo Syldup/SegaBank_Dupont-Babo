@@ -3,6 +3,7 @@ package bo;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Agence {
@@ -52,15 +53,29 @@ public class Agence {
                 id, code, adresse);
     }
 
-    public void ajouterCompte(Compte compte) {
+    public void addCompte(Compte compte) {
         this.comptes.add(compte);
     }
 
-    public void ajouterComptes(List<Compte> comptes) {
-        this.comptes.addAll(comptes);
+    public void addComptesSimple(List<CompteSimple> comptes) {
+        for (Compte c : comptes)
+            this.comptes.add(c);
+    }
+    public void addComptesEpargne(List<CompteEpargne> comptes) {
+        for (Compte c : comptes)
+            this.comptes.add(c);
     }
 
-    public void clear() {
+    public void clearComptes() {
         this.comptes.clear();
+    }
+
+    public void sortComptes() {
+        Collections.sort(this.comptes);
+    }
+
+    public void printComptes() {
+        for (int i=0; i<comptes.size(); i++)
+            System.out.printf("%d - %s%n", i+1, comptes.get(i));
     }
 }

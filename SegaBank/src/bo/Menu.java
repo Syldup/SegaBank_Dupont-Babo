@@ -1,49 +1,46 @@
 package bo;
 
-import dal.AgenceDAO;
-import dal.CompteDAO;
-import dal.CompteEpargneDAO;
-import dal.CompteSimpleDAO;
+import dal.*;
 
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Menu {
     Scanner sc = new Scanner(System.in);
     private List<Agence> agences;
-    private List<Compte> comptes;
-    List<Compte> comptesSimple = new ArrayList<Compte>();
-    List<Compte> comptesEpargne = new ArrayList<Compte>();
-
 
     public Menu() {
         agences = new ArrayList<Agence>();
-        comptes = new ArrayList<Compte>();
     }
 
-    public int getNumber() {
-        int response = 0;
+    public double getNumber() {
+        double rep = 0;
         boolean ok = false;
         do {
             if (ok)
                 System.out.println( "Mauvais choix... merci de recommencer !" );
                 System.out.print( "Entrez votre choix : " );
             try {
-                response = sc.nextInt();
-            } catch ( InputMismatchException e ) {
-                response = 0;
+                rep = Double.valueOf(sc.nextLine().replace(',','.'));
+            } catch ( NumberFormatException e ) {
+                rep = 0;
                 ok = true;
-            } finally {
-                sc.nextLine();
             }
-        } while (ok);
-        return response;
+        } while (ok && rep==0);
+        return rep;
     }
 
     public int getNumber(int max) {
         int response = 0;
+        do {
+            if (response < 0 || response > max)
+                System.out.printf( "Entrer un nombre entre %d et %d comprie !%n", 0, max );
+            response = (int)getNumber();
+        } while (response < 0 || response > max);
+        return response;
+    }
+
+    public double getNumber(double max) {
+        double response = 0;
         do {
             if (response < 0 || response > max)
                 System.out.printf( "Entrer un nombre entre %d et %d comprie !%n", 0, max );
@@ -62,8 +59,6 @@ public class Menu {
         } while (str.equals("") || str.length() > 40);
         return str;
     }
-
-
 
     public void mainMenu() {
         int response;
@@ -162,7 +157,7 @@ public class Menu {
         int rep;
         Agence curAgence = null;
         do {
-            rep = getNumber();
+            rep = (int)getNumber();
             if (rep > 0)
                 curAgence = AgenceDAO.getDAO().findById(rep);
             else if (rep >= -agences.size() && rep < 0)
@@ -197,49 +192,34 @@ public class Menu {
     }
 
     public void createCompte(Agence curAgence) {
-        int rep;
         System.out.println("1 - Compte simple");
         System.out.println("2 - Compte simple payant");
         System.out.println("3 - Compte épargne");
         System.out.println("4 - Compte épargne payant");
-        rep = getNumber(4);
+        int rep = getNumber(4);
 
         System.out.println("Identifiant :");
-        int identifiant = getNumber(10);
+        int identifiant = (int)getNumber();
         System.out.println("Solde par défaut :");
-        int solde = getNumber(1000);
+        double solde = getNumber(10000.0);
+
+        Compte compte;
         switch (rep) {
             case 1:
-                System.out.println("Découvert autorisé : ");
-                double decouvert = getNumber(1000);
-                CompteSimple compte = new CompteSimple(identifiant,solde,decouvert);
-                CompteSimpleDAO.getDAO().create(compte, curAgence.getId());
-                comptesSimple.add(compte);
-                curAgence.ajouterCompte(compte);
-                break;
             case 2:
                 System.out.println("Découver autorisé : ");
-                double decouvert2 = getNumber(1000);
-                CompteSimple compte2 = new CompteSimple(identifiant,solde,decouvert2,true);
-                CompteSimpleDAO.getDAO().create(compte2, curAgence.getId());
-                comptesSimple.add(compte2);
-                curAgence.ajouterCompte(compte2);
+                double decouvert = getNumber(10000.0);
+                compte = new CompteSimple(identifiant, solde, decouvert,rep == 2);
+                CompteSimpleDAO.getDAO().create((CompteSimple)compte, curAgence.getId());
+                curAgence.addCompte(compte);
                 break;
             case 3:
-                System.out.println("Taux d'intérêt : ");
-                double taux = getNumber(100);
-                CompteEpargne compte3 = new CompteEpargne(identifiant, solde, taux);
-                CompteEpargneDAO.getDAO().create(compte3, curAgence.getId());
-                comptesEpargne.add(compte3);
-                curAgence.ajouterCompte(compte3);
-                break;
             case 4:
                 System.out.println("Taux d'intérêt :");
-                double taux2 = getNumber(100);
-                CompteEpargne compte4 = new CompteEpargne(identifiant, solde, taux2, true);
-                CompteEpargneDAO.getDAO().create(compte4, curAgence.getId());
-                comptesEpargne.add(compte4);
-                curAgence.ajouterCompte(compte4);
+                double taux = getNumber(100.0);
+                compte = new CompteEpargne(identifiant, solde, taux, rep == 4);
+                CompteEpargneDAO.getDAO().create((CompteEpargne)compte, curAgence.getId());
+                curAgence.addCompte(compte);
                 break;
         }
     }
@@ -252,22 +232,25 @@ public class Menu {
             System.out.println("0 - Retour");
             switch (getNumber(2)) {
                 case 1:
-                    curAgence.clear();
-                    curAgence.ajouterComptes(CompteSimpleDAO.getDAO().findAgence(curAgence.getId()));
+                    curAgence.clearComptes();
+                    curAgence.addComptesSimple(CompteSimpleDAO.getDAO().findByIdAgence(curAgence.getId()));
+                    curAgence.addComptesEpargne(CompteEpargneDAO.getDAO().findByIdAgence(curAgence.getId()));
+                    curAgence.sortComptes();
                 case 2: break;
                 default: return;
             }
         } else {
-            curAgence.ajouterComptes(comptesSimple);
-            curAgence.ajouterComptes(comptesEpargne);
+            curAgence.addComptesSimple(CompteSimpleDAO.getDAO().findByIdAgence(curAgence.getId()));
+            curAgence.addComptesEpargne(CompteEpargneDAO.getDAO().findByIdAgence(curAgence.getId()));
+            curAgence.sortComptes();
         }
 
         System.out.println( "=====================================" );
         System.out.println( "========= LISTE DES COMPTES =========" );
         System.out.println( "=====================================" );
 
-        for (int i=0; i<comptesSimple.size(); i++)
-            System.out.printf("%d - %s%n", i+1, comptesSimple.get(i));
+        curAgence.printComptes();
+
        // selectAgence();
     }
 }

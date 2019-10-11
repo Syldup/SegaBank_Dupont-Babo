@@ -101,7 +101,7 @@ public class CompteSimpleDAO implements IDAO<Integer, CompteSimple> {
         }
     }
 
-    public List<CompteSimple> findAgence(Integer interger) {
+    public List<CompteSimple> findByIdAgence(Integer interger) {
         List<CompteSimple> objects = new ArrayList<CompteSimple>();
         try (Connection conn = PersistenceManager.getConn();
              PreparedStatement ps = conn.prepareStatement(FIND_BY_AGENCE_QUERY, Statement.RETURN_GENERATED_KEYS)) {

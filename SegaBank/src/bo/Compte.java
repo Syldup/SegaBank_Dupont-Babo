@@ -3,7 +3,7 @@ package bo;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Compte {
+public class Compte implements Comparable<Compte> {
     protected int id = 0;
     protected int identifient;
     protected double solde;
@@ -58,6 +58,9 @@ public class Compte {
         } else {
             this.solde -= solde;
         }
+    }
+    public int compareTo(Compte o) {
+        return this.id - o.id;
     }
 
     @Override
