@@ -2,6 +2,10 @@ package bo;
 
 import dal.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.*;
 
 public class Menu {
@@ -177,8 +181,8 @@ public class Menu {
             System.out.println( "1 - Modifier l'agence" );
             System.out.println( "2 - Supprimer l'agence" );
             System.out.println( "3 - Créer un comple" );
-            System.out.println( "4 - Sélectionner un compte" );
-            System.out.println( "5 - Liser les comples" );
+            System.out.println( "4 - Liser les comples" );
+            System.out.println( "5 - Exporter en csv");
             System.out.println( "0 - Quitter" );
             rep = getNumber(5);
 
@@ -189,8 +193,9 @@ public class Menu {
                     rep = 0;
                     break;
                 case 3: createCompte(curAgence); break;
-                case 4: selectCompte(curAgence); break;
-                case 5: listCompte(curAgence); break;
+             /* case 4: selectCompte(curAgence); break;*/
+                case 4: listCompte(curAgence); break;
+                case 5: export(curAgence);
             }
         }
     }
@@ -215,7 +220,7 @@ public class Menu {
         switch (rep) {
             case 1:
             case 2:
-                System.out.println("Découver autorisé : ");
+                System.out.println("Découvert autorisé : ");
                 double decouvert = getNumber(10000.0);
                 compte = new CompteSimple(identifiant, solde, decouvert,rep == 2);
                 CompteSimpleDAO.getDAO().create((CompteSimple)compte, curAgence.getId());
@@ -316,6 +321,38 @@ public class Menu {
         System.out.println("1 - Non");
         if (getNumber() == 0)
             curAgence.removeCompte(curCompte);
+    }
+
+    public void export(Agence curAgence) {
+
+        curAgence.clearComptes();
+        curAgence.addComptes(CompteDAO.getDAO().findByIdAgence(curAgence.getId()));
+        
+        try (PrintWriter writer = new PrintWriter(new File("./resources/export.csv"))){
+            StringBuilder sb = new StringBuilder();
+            sb.append("Identifiant");
+            sb.append(",");
+            sb.append("Solde");
+            sb.append(",");
+            sb.append("Payant");
+            sb.append("\n");
+
+            for(Compte compte : curAgence.getComptes()) {
+                sb.append(compte.id);
+                sb.append(",");
+                sb.append(compte.solde);
+                sb.append(",");
+                if (compte.payant)
+                    sb.append("Oui");
+                else
+                    sb.append("Non");
+                sb.append("\n");
+            }
+            writer.write(sb.toString());
+            System.out.println("done !");
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
 
