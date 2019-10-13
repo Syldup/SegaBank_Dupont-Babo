@@ -56,6 +56,7 @@ public class Agence {
     }
 
     public Compte getCompte(int nb) { return this.comptes.get(nb); }
+    public List<Compte> getComptes() { return comptes; }
     public void addCompte(Compte compte) { this.comptes.add(compte); }
     public void addComptes(List<Compte> comptes) { this.comptes.addAll(comptes); }
 

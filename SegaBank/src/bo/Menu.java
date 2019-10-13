@@ -260,9 +260,9 @@ public class Menu {
         if(curAgence.getNbCompte() == 0) {
             System.out.println("Il n'y a pas de compte enregistré");
             return;
-        } else
-            curAgence.printComptes();
+        }
 
+        curAgence.printComptes();
         selectCompte(curAgence);
     }
 
@@ -327,26 +327,18 @@ public class Menu {
 
         curAgence.clearComptes();
         curAgence.addComptes(CompteDAO.getDAO().findByIdAgence(curAgence.getId()));
-        
-        try (PrintWriter writer = new PrintWriter(new File("./resources/export.csv"))){
+
+        try (PrintWriter writer = new PrintWriter(new File(String.format("./resources/export_Agence_%d.csv", curAgence.getId())))){
             StringBuilder sb = new StringBuilder();
-            sb.append("Identifiant");
-            sb.append(",");
-            sb.append("Solde");
-            sb.append(",");
-            sb.append("Payant");
-            sb.append("\n");
+            sb.append("idCompte, identifiant, solde, payant, decouvert, tauxInteret\n");
 
             for(Compte compte : curAgence.getComptes()) {
-                sb.append(compte.id);
-                sb.append(",");
-                sb.append(compte.solde);
-                sb.append(",");
-                if (compte.payant)
-                    sb.append("Oui");
-                else
-                    sb.append("Non");
-                sb.append("\n");
+                sb.append(compte.getId()).append(",");
+                sb.append(compte.getIdentifient()).append(",");
+                sb.append(compte.getSolde()).append(",");
+                sb.append(compte.isPayant()?"Oui":"Non").append(",");
+                sb.append(compte instanceof CompteSimple? ((CompteSimple) compte).getDecouvert():"null").append(",");
+                sb.append(compte instanceof CompteEpargne? ((CompteEpargne) compte).getTauxInteret():"null").append("\n");
             }
             writer.write(sb.toString());
             System.out.println("done !");
