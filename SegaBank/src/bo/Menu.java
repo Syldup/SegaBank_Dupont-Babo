@@ -87,6 +87,7 @@ public class Menu {
         Agence agence = new Agence(codeAgence, adresseAgence);
         AgenceDAO.getDAO().create(agence);
         agences.add(agence);
+        System.out.println(agence);
     }
 
     public void listAgence() {
@@ -112,7 +113,7 @@ public class Menu {
         if (agences.size() == 0) {
             System.out.println("Il n'y a pas d'agences enregistrées");
             return;
-        }
+        } else
         for (int i=0; i<agences.size(); i++)
             System.out.printf("%d - %s%n", i+1, agences.get(i));
         selectAgence();
@@ -162,9 +163,10 @@ public class Menu {
         Agence curAgence = null;
         do {
             rep = (int)getNumber();
-            if (rep > 0)
+            if (rep > 0) {
                 curAgence = AgenceDAO.getDAO().findById(rep);
-            else if (rep >= -agences.size() && rep < 0)
+
+            } else if (rep >= -agences.size() && rep < 0)
                 curAgence = agences.get(-rep-1);
         } while (curAgence == null && rep != 0);
 
@@ -187,20 +189,22 @@ public class Menu {
                     rep = 0;
                     break;
                 case 3: createCompte(curAgence); break;
-                /*
-                case 4: selectCompte(); break;
-                 */
+                case 4: selectCompte(curAgence); break;
                 case 5: listCompte(curAgence); break;
             }
         }
     }
 
     public void createCompte(Agence curAgence) {
+        System.out.println("Type de compte possible :");
         System.out.println("1 - Compte simple");
         System.out.println("2 - Compte simple payant");
         System.out.println("3 - Compte épargne");
         System.out.println("4 - Compte épargne payant");
+        System.out.println("0 - Retour");
         int rep = getNumber(4);
+        if (rep == 0)
+            return;
 
         System.out.println("Identifiant :");
         int identifiant = (int)getNumber();
@@ -229,7 +233,7 @@ public class Menu {
     }
 
     public void listCompte(Agence curAgence) {
-        if (curAgence.getComptes().size() != 0) {
+        if (curAgence.getNbCompte() != 0) {
             System.out.println("Actualiser la listes des comptes : ");
             System.out.println("1 - Oui");
             System.out.println("2 - Non");
@@ -237,27 +241,22 @@ public class Menu {
             switch (getNumber(2)) {
                 case 1:
                     curAgence.clearComptes();
-                    curAgence.addComptesSimple(CompteSimpleDAO.getDAO().findByIdAgence(curAgence.getId()));
-                    curAgence.addComptesEpargne(CompteEpargneDAO.getDAO().findByIdAgence(curAgence.getId()));
-                    curAgence.sortComptes();
+                    curAgence.addComptes(CompteDAO.getDAO().findByIdAgence(curAgence.getId()));
                 case 2: break;
                 default: return;
             }
-        } else {
-            curAgence.addComptesSimple(CompteSimpleDAO.getDAO().findByIdAgence(curAgence.getId()));
-            curAgence.addComptesEpargne(CompteEpargneDAO.getDAO().findByIdAgence(curAgence.getId()));
-            curAgence.sortComptes();
-        }
+        } else
+            curAgence.addComptes(CompteDAO.getDAO().findByIdAgence(curAgence.getId()));
 
         System.out.println( "=====================================" );
         System.out.println( "========= LISTE DES COMPTES =========" );
         System.out.println( "=====================================" );
 
-        if(curAgence.getComptes().size() == 0) {
+        if(curAgence.getNbCompte() == 0) {
             System.out.println("Il n'y a pas de compte enregistré");
             return;
-        }
-        curAgence.printComptes();
+        } else
+            curAgence.printComptes();
 
         selectCompte(curAgence);
     }
@@ -265,7 +264,7 @@ public class Menu {
 
     public void selectCompte(Agence curAgence) {
         System.out.println( "Sélectionner un compte : " );
-        System.out.println("-X - Le numéro du compte");
+        System.out.println("-X - Le Xème compte");
         System.out.println("Y - L'agence numero Y");
         System.out.println("0 - Retour");
         int rep = 0;
@@ -273,9 +272,9 @@ public class Menu {
         do {
             rep = (int)getNumber();
             if (rep > 0)
-                curCompte = curAgence.getComptes().get(rep-1);
-            else if (rep >= -curAgence.getComptes().size() && rep < 0)
-                curCompte = curAgence.getComptes().get(-rep-1);
+                curCompte = curAgence.getCompte(rep-1);
+            else if (rep >= -curAgence.getNbCompte() && rep < 0)
+                curCompte = curAgence.getCompte(-rep-1);
         } while (curCompte == null && rep != 0);
 
         while (rep != 0) {
@@ -294,11 +293,6 @@ public class Menu {
                 case 3: deleteCompte(curAgence, curCompte);
                     rep = 0;
                     break;
-
-                /*
-                case 4: selectCompte(); break;
-                 */
-                //case 5: listCompte(curAgence); break;
             }
         }
     }
@@ -320,14 +314,8 @@ public class Menu {
         System.out.println("Etes-vous sûr : ");
         System.out.println("0 - Oui");
         System.out.println("1 - Non");
-        if (getNumber() == 0) {
-            curAgence.getComptes().remove(curCompte);
-            if (curCompte instanceof CompteSimple)
-                CompteSimpleDAO.getDAO().deleteById(curCompte.getId());
-            else if (curCompte instanceof CompteEpargne)
-                CompteEpargneDAO.getDAO().deleteById(curCompte.getId());
-            CompteDAO.getDAO().deleteById(curCompte.getId());
-        }
+        if (getNumber() == 0)
+            curAgence.removeCompte(curCompte);
     }
 }
 

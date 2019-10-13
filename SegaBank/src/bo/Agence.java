@@ -1,5 +1,9 @@
 package bo;
 
+import dal.CompteDAO;
+import dal.CompteEpargneDAO;
+import dal.CompteSimpleDAO;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -44,8 +48,6 @@ public class Agence {
         this.adresse = adresse;
     }
 
-    public List<Compte> getComptes() { return comptes; }
-    public void setComptes(List<Compte> comptes) { this.comptes = comptes; }
 
     @Override
     public String toString() {
@@ -53,28 +55,24 @@ public class Agence {
                 id, code, adresse);
     }
 
-    public void addCompte(Compte compte) {
-        this.comptes.add(compte);
+    public Compte getCompte(int nb) { return this.comptes.get(nb); }
+    public void addCompte(Compte compte) { this.comptes.add(compte); }
+    public void addComptes(List<Compte> comptes) { this.comptes.addAll(comptes); }
+
+    public void removeCompte(Compte compte) {
+        if (compte instanceof CompteSimple)
+            CompteSimpleDAO.getDAO().deleteById(compte.getId());
+        else if (compte instanceof CompteEpargne)
+            CompteEpargneDAO.getDAO().deleteById(compte.getId());
+        CompteDAO.getDAO().deleteById(compte.getId());
+        this.comptes.remove(compte);
     }
 
-    public void addComptesSimple(List<CompteSimple> comptes) {
-        for (Compte c : comptes)
-            this.comptes.add(c);
-    }
-    public void addComptesEpargne(List<CompteEpargne> comptes) {
-        for (Compte c : comptes)
-            this.comptes.add(c);
-    }
-
-    public void clearComptes() {
-        this.comptes.clear();
-    }
-
-    public void sortComptes() {
-        Collections.sort(this.comptes);
-    }
+    public void clearComptes() { this.comptes.clear(); }
+    public int getNbCompte() { return this.comptes.size(); }
 
     public void printComptes() {
+        Collections.sort(this.comptes);
         for (int i=0; i<comptes.size(); i++)
             System.out.printf("%d - %s%n", i+1, comptes.get(i));
     }

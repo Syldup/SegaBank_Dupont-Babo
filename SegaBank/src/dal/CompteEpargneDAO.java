@@ -101,11 +101,11 @@ public class CompteEpargneDAO implements IDAO<Integer, CompteEpargne> {
         }
     }
 
-    public List<CompteEpargne> findByIdAgence(Integer interger) {
+    public List<CompteEpargne> findByIdAgence(Integer integer) {
         List<CompteEpargne> objects = new ArrayList<CompteEpargne>();
         try (Connection conn = PersistenceManager.getConn();
              PreparedStatement ps = conn.prepareStatement(FIND_BY_AGENCE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setInt(1, interger);
+            ps.setInt(1, integer);
             ps.executeQuery();
             try(ResultSet rs = ps.executeQuery();) {
                 while (rs.next())

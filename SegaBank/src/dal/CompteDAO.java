@@ -1,9 +1,12 @@
 package dal;
 
 import bo.Compte;
+import bo.CompteEpargne;
+import bo.CompteSimple;
 
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CompteDAO implements IDAO<Integer, Compte> {
@@ -12,6 +15,8 @@ public class CompteDAO implements IDAO<Integer, Compte> {
     private static final String INSERT_QUERY = "INSERT INTO compte (identifiant, solde, payant, idAgence) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_QUERY = "UPDATE compte SET identifiant=?, solde=?, payant=? WHERE idCompte = ?";
     private static final String DELETE_QUERY = "DELETE FROM compte WHERE idCompte=?";
+    private static final String FIND_ALL_QUERY = "SELECT idCompte, identifiant, solde, payant, idAgence, tauxInteret, decouvert FROM compte c" +
+            "LEFT JOIN compteepargne AS ce ON c.idCompte=ce.idCompte LEFT JOIN comptesimple AS cs ON c.idCompte=cs.idCompte";
 
     private CompteDAO() {}
 
@@ -51,10 +56,38 @@ public class CompteDAO implements IDAO<Integer, Compte> {
     }
 
     @Override
-    public List<Compte> findAll() { return null; }
+    public List<Compte> findAll() {
+        List<Compte> objects = new ArrayList<Compte>();
+        try (Connection conn = PersistenceManager.getConn();
+             Statement s = conn.createStatement();
+             ResultSet rs = s.executeQuery(FIND_ALL_QUERY)) {
+            while (rs.next()) {
+                rs.getInt("tauxInteret");
+                if (rs.wasNull())
+                    objects.add(new CompteEpargne(rs));
+                else objects.add(new CompteSimple(rs));
+            }
+        } catch (SQLException | IOException e) {
+            System.out.println(e.getMessage());
+        }
+        return objects;}
 
     @Override
-    public Compte findById(Integer integer) { return null; }
+    public Compte findById(Integer integer) {
+        Compte object = null;
+        try (Connection conn = PersistenceManager.getConn();
+             Statement s = conn.createStatement();
+             ResultSet rs = s.executeQuery(String.format("%s WHERE c.idCompte=%d", FIND_ALL_QUERY, integer))) {
+            if (rs.next()) {
+                rs.getInt("tauxInteret");
+                if (rs.wasNull())
+                    object = new CompteEpargne(rs);
+                else object = new CompteSimple(rs);
+            }
+        } catch (SQLException | IOException e) {
+            System.out.println(e.getMessage());
+        }
+        return object; }
 
     @Override
     public void deleteById(Integer integer) {
@@ -65,5 +98,22 @@ public class CompteDAO implements IDAO<Integer, Compte> {
         } catch (SQLException | IOException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public List<Compte> findByIdAgence(Integer integer) {
+        List<Compte> objects = new ArrayList<Compte>();
+        try (Connection conn = PersistenceManager.getConn();
+             Statement s = conn.createStatement();
+             ResultSet rs = s.executeQuery(String.format("%s WHERE c.idAgence=%d", FIND_ALL_QUERY, integer))) {
+            while (rs.next()) {
+                rs.getInt("tauxInteret");
+                if (rs.wasNull())
+                    objects.add(new CompteEpargne(rs));
+                else objects.add(new CompteSimple(rs));
+            }
+        } catch (SQLException | IOException e) {
+            System.out.println(e.getMessage());
+        }
+        return objects;
     }
 }
